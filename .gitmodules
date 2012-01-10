@@ -1,0 +1,12 @@
+[submodule "vendor/Symfony/Component/DomCrawler"]
+	path = vendor/Symfony/Component/DomCrawler
+	url = https://github.com/symfony/DomCrawler
+[submodule "vendor/buzz"]
+	path = vendor/buzz
+	url = https://github.com/kriswallsmith/Buzz
+[submodule "vendor/Symfony/Component/ClassLoader"]
+	path = vendor/Symfony/Component/ClassLoader
+	url = https://github.com/symfony/ClassLoader
+[submodule "vendor/Symfony/Component/CssSelector"]
+	path = vendor/Symfony/Component/CssSelector
+	url = https://github.com/symfony/CssSelector
