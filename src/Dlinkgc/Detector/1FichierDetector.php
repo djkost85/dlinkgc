@@ -2,7 +2,7 @@
 
 namespace Dlinkgc\Detector;
 
-class FileSonicDetector implements DetectorInterface
+class 1FichierDetector implements DetectorInterface
 {
     public function getName()
     {
@@ -17,6 +17,6 @@ class FileSonicDetector implements DetectorInterface
 
     public function getCrawler()
     {
-        return new \Dlinkgc\Crawler\FileSonicCrawler();
+        return new \Dlinkgc\Crawler\1FichierCrawler();
     }
 }

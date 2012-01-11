@@ -2,65 +2,62 @@
 
 namespace Dlinkgc\Detector;
 
-class DetectorBag
+class DetectorBag implements \ArrayAccess
 {
-    protected $detectors = array();
+    protected $values = array();
 
     public function __construct(array $detectors = null)
     {
         if ($detectors) {
-            foreach ($detectors as $detector)
-                $this->addDetector($detector);
+            foreach($detectors as $detector)
+                $this->offsetSet(null, $detector);
         }
     }
 
-    public function addDetector(DetectorInterface $detector)
+    public function offsetSet($id = null, $detector)
     {
+        if (! $detector instanceof DetectorInterface)
+            throw new \InvalidArgumentException(sprintf("value must be an instance of Dlinkgc\Detector\DetectorInterface, (%s) `%s` given", gettype($detector), $detector));
+        
+
         if (! $detector->getName())
-            throw new \Exception(sprintf("getName method of %s cannot return an empty string", get_class($detector)));
-            
-        $this->detectors[(string) $detector->getName()] = $detector;
+            throw new \LogicException(sprintf("getName method of %s can not return an empty string", get_class($detector)));
+
+        $id = is_null($id) ? (string) $detector->getName() : $id;
+
+        $this->values[$id] = $detector;
     }
 
-    public function hasDetector($detector)
+    public function offsetGet($id)
     {
-        $detector = $this->detectorToString($detector);
+        $id = $this->getDetectorName($id);
 
-        if (isset($this->detectors[$detector]))
-            return true;
+        if (! array_key_exists($id, $this->values))
+            throw new \InvalidArgumentException(sprintf('Identifier "%s" is not defined.', $id));
 
-        return false;
+        return $this->values[$id];
     }
 
-    public function getDetector($detector)
+    public function offsetExists($id)
     {
-        $detector = $this->detectorToString($detector);
-
-        if (isset($this->detectors[$detector]))
-            return $this->detectors[$detector];
-
-        return null;
+        return isset($this->values[$this->getDetectorName($id)]);
     }
 
-    public function getDetectors()
+    public function offsetUnset($id)
     {
-        return $this->detectors;
+        unset($this->values[$this->getDetectorName($id)]);
     }
 
-    public function removeDetector($detector)
+    public function getAll()
     {
-        $detector = $this->detectorToString($detector);
-
-        unset($this->detectors[$detector]);
+        return $this->values;
     }
 
-    protected function detectorToString($detector)
+    protected function getDetectorName($detectorName)
     {
-        if ($detector instanceof DetectorInterface)
-            $detector = $detector->getName();
+        if ($detectorName instanceof DetectorInterface)
+            $detectorName = $detectorName->getName();
 
-        return $detector;
+        return $detectorName;
     }
-
-
 }
