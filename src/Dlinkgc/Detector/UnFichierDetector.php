@@ -2,21 +2,21 @@
 
 namespace Dlinkgc\Detector;
 
-class GigaupDetector implements DetectorInterface
+class UnFichierDetector implements DetectorInterface
 {
     public function getName()
     {
-        return 'gigaup';
+        return '1fichier';
     }
 
     public function verify($url)
     {
-        if (false !== strpos($url, 'gigaup.fr/'))
+        if (false !== strpos($url, '1fichier.com'))
             return true;
     }
 
     public function getCrawler()
     {
-        return new \Dlinkgc\Crawler\GigaupCrawler();
+        return new \Dlinkgc\Crawler\UnFichierCrawler();
     }
 }

@@ -8,9 +8,9 @@ class RapidShareCrawler extends Crawler
     {
          $dc = $this->getResponseDomCrawler();
         
-         $node = $dc->filter('a.downloadLink');
+         $node = $dc->filter('#download-errorbox');
         
-        if (count($node) !== 1)
+        if (count($node) > 0)
             return false;
 
         return true;

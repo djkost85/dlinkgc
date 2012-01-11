@@ -2,21 +2,21 @@
 
 namespace Dlinkgc\Detector;
 
-class FileSonicDetector implements DetectorInterface
+class UploadhereDetector implements DetectorInterface
 {
     public function getName()
     {
-        return 'filesonic';
+        return 'uploadhere';
     }
 
     public function verify($url)
     {
-        if (false !== strpos($url, 'filesonic.fr/file/'))
+        if (false !== strpos($url, 'uploadhere.com/'))
             return true;
     }
 
     public function getCrawler()
     {
-        return new \Dlinkgc\Crawler\FileSonicCrawler();
+        return new \Dlinkgc\Crawler\UploadhereCrawler();
     }
 }

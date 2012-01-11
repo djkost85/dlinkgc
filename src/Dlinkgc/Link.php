@@ -17,13 +17,16 @@ class Link
 
     public function __construct($url = null, $detector = null, $status = null)
     {
-        if (! is_null($url)) $this->url = $url;
+        if (! is_null($url)) $this->setUrl($url);
         if (! is_null($detector)) $this->detector = $detector;
         if (! is_null($status)) $this->status = $status;
     }
 
     public function setUrl($url)
     {
+        if (! filter_var($url, FILTER_VALIDATE_URL))
+            throw new \Exception(sprintf("The URL `%s` has wrong format", $url));
+
         $this->url = $url;
 
         return $this;

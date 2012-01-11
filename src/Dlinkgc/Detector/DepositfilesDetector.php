@@ -2,21 +2,21 @@
 
 namespace Dlinkgc\Detector;
 
-class FileSonicDetector implements DetectorInterface
+class DepositfilesDetector implements DetectorInterface
 {
     public function getName()
     {
-        return 'filesonic';
+        return 'depositfiles';
     }
 
     public function verify($url)
     {
-        if (false !== strpos($url, 'filesonic.fr/file/'))
+        if (false !== strpos($url, 'depositfiles.com/files/'))
             return true;
     }
 
     public function getCrawler()
     {
-        return new \Dlinkgc\Crawler\FileSonicCrawler();
+        return new \Dlinkgc\Crawler\DepositfilesCrawler();
     }
 }

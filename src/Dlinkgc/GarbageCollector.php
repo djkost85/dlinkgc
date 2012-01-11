@@ -6,20 +6,21 @@ use Dlinkgc\Detector\DetectorBag;
 use Dlinkgc\Detector\DetectorInterface;
 use Dlinkgc\Crawler\Crawler;
 use Dlinkgc\Link;
-use Buzz\Message\Factory;
-use Buzz\Client\MultiCurl as Client;
-
+use Buzz\Message;
+use Buzz\Client;
 class GarbageCollector
 {
     protected $detectorBag;
     protected $messageFactory;
     protected $client;
 
-    public function __construct(DetectorBag $detectorBag = null)
+    public function __construct(DetectorBag $detectorBag = null, 
+                                Message\FactoryInterface $factory = null,
+                                Client\BatchClientInterface $client = null)
     {
         $this->detectorBag = $detectorBag ?: new DetectorBag($this->getDefaultDetectors());
-        $this->messageFactory = new Factory();
-        $this->client = new Client();
+        $this->messageFactory = $factory ?: new Message\Factory();
+        $this->client = $client ?: new Client\MultiCurl();
     }
 
     public function detectCrawler($url)
@@ -39,9 +40,6 @@ class GarbageCollector
 
         foreach($links as $link) {
             if (! $link instanceof Link) $link = new Link($link);
-
-            // if (! filter_var($url, FILTER_VALIDATE_URL))
-            //     throw new \Exception(sprintf("The URL `%s` has wrong format", $url));
                 
             $crawler = null;
             if ($link->getDetector() && $detector = $this->getDetector($link->getDetector())) {
@@ -134,6 +132,17 @@ class GarbageCollector
         return array(
             new Detector\MegaUploadDetector(),
             new Detector\FileSonicDetector(),
+            new Detector\RapidShareDetector(),
+            new Detector\UnFichierDetector(),
+            new Detector\DepositfilesDetector(),
+            new Detector\FileserveDetector(),
+            new Detector\FufoxDetector(),
+            new Detector\GigaupDetector(),
+            new Detector\UploadhereDetector(),
+            new Detector\UploadkingDetector(),
+            new Detector\UptoboxDetector(),
+
+
         );
     }
 }
