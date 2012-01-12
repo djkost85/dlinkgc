@@ -9,6 +9,7 @@ class Link
     CONST DEAD_STATUS  = 'dead';
     CONST SCHRO_STATUS = 'error';
     CONST ALIVE_STATUS = 'alive';
+    CONST NO_STATUS    = 'no_response';
 
     protected $url;
     protected $status;
@@ -87,5 +88,10 @@ class Link
     public function isSchro()
     {
         return self::SCHRO_STATUS == $this->status;
+    }
+
+    public function hasNoStatus()
+    {
+        return self::NO_STATUS == $this->status;
     }
 }

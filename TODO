@@ -1,1 +1,1 @@
-http://php.net/manual/fr/class.arrayiterator.php
+option, si le crawler n'est pas trouvable, ne pas crawler le lien, plutot que d'utiliser le CommonCrawler

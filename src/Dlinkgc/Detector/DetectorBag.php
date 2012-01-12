@@ -48,7 +48,7 @@ class DetectorBag implements \ArrayAccess
         unset($this->values[$this->getDetectorName($id)]);
     }
 
-    public function getAll()
+    public function getIterator()
     {
         return $this->values;
     }

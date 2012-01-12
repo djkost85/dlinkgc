@@ -2,21 +2,21 @@
 
 namespace Dlinkgc\Detector;
 
-class FufoxDetector implements DetectorInterface
+class FilejungleDetector implements DetectorInterface
 {
     public function getName()
     {
-        return 'fufox';
+        return 'filejungle';
     }
 
     public function verify($url)
     {
-        if (false !== strpos($url, 'fufox.net/'))
+        if (false !== strpos($url, 'filejungle.com/'))
             return true;
     }
 
     public function getCrawler()
     {
-        return new \Dlinkgc\Crawler\FufoxCrawler();
+        return new \Dlinkgc\Crawler\FilejungleCrawler();
     }
 }

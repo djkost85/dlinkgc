@@ -8,6 +8,7 @@ use Dlinkgc\Crawler\Crawler;
 use Dlinkgc\Link;
 use Buzz\Message;
 use Buzz\Client;
+
 class GarbageCollector
 {
     protected $detectorBag;
@@ -25,11 +26,32 @@ class GarbageCollector
 
     public function detectCrawler($url)
     {
-        foreach ($this->detectorBag->getAll() as $detector) {
+        foreach ($this->detectorBag->getIterator() as $detector) {
             if ($detector->verify($url)) {
                 return $detector->getName();
             }
         }
+    }
+
+    public function getCrawler(Link $link)
+    {
+        $crawler = null;
+        if ($link->getDetector() && $detector = $this->getDetector($link->getDetector())) {
+            $crawler = $detector->getCrawler();
+        }
+        else {
+            if ($detector = $this->getDetector($this->detectCrawler($link->getUrl()))) {
+                $link->setDetector($detector->getName());
+                $crawler = $detector->getCrawler();
+            }
+        }
+        
+        if (is_null($crawler)) {
+            $detector = new Detector\CommonDetector();
+            $crawler = $detector->getCrawler();
+        }
+
+        $link->setCrawler($crawler);
     }
 
     public function collect($links)
@@ -40,46 +62,21 @@ class GarbageCollector
 
         foreach($links as $link) {
             if (! $link instanceof Link) $link = new Link($link);
-                
-            $crawler = null;
-            if ($link->getDetector() && $detector = $this->getDetector($link->getDetector())) {
-                $crawler = $detector->getCrawler();
-            }
-            else {
-                if ($detector = $this->getDetector($this->detectCrawler($link->getUrl()))) {
-                    $link->setDetector($detector->getName());
-                    $crawler = $detector->getCrawler();
-                }
-            }
+
+            if (isset($_links[$link->getUrl()])) break;
             
-            if (is_null($crawler)) {
-                $detector = new Detector\CommonDetector();
-                $crawler = $detector->getCrawler();
-            }
+            if (! $link->getCrawler())
+                $this->getCrawler($link);
 
-            if (! $crawler instanceof Crawler)
-                        throw new \Exception(sprintf("%s::getCrawler method must return an instance of Dlinkgc\Crawler\Crawler", get_class($detector)));
-
-            $link->setCrawler($crawler);
-            $this->addToQueue($link);
+            $this->addToClientQueue($link);
 
             $_links[$link->getUrl()] = $link;
         }
 
         $this->client->flush();
 
-        foreach($_links as $link) {
-            
-            $http_status = $link->getCrawler()->getResponse()->getStatusCode();
-            if (500 <= $http_status)
-                $status = Link::SCHRO_STATUS;
-            elseif (200 >= $http_status && $http_status < 300)
-                $status = $link->getCrawler()->execute() ? Link::ALIVE_STATUS : Link::DEAD_STATUS;
-            else
-                $status = Link::DEAD_STATUS;
-
-            $link->setStatus($status);
-        }
+        foreach($_links as $link)
+            $this->crawlLink($link);
 
         return $_links;
     }
@@ -114,7 +111,7 @@ class GarbageCollector
         return null;
     }
 
-    protected function addToQueue(Link $link)
+    protected function addToClientQueue(Link $link)
     {
         $request = $this->messageFactory->createRequest();
         $request->fromUrl($link->getUrl());
@@ -127,22 +124,40 @@ class GarbageCollector
         $this->client->send($crawler->getRequest(), $crawler->getResponse());
     }
 
+    protected function crawlLink(Link $link)
+    {
+            $http_status = $link->getCrawler()->getResponse()->getStatusCode();
+
+            if (empty($http_status))
+                $status = Link::NO_STATUS;
+
+            if (500 <= $http_status)
+                $status = Link::SCHRO_STATUS;
+            elseif (200 >= $http_status && $http_status < 300)
+                $status = $link->getCrawler()->execute() ? Link::ALIVE_STATUS : Link::DEAD_STATUS;
+            else
+                $status = Link::DEAD_STATUS;
+
+            $link->setStatus($status);
+    }
+
     protected function getDefaultDetectors()
     {
         return array(
             new Detector\MegaUploadDetector(),
             new Detector\FileSonicDetector(),
-            new Detector\RapidShareDetector(),
+            //new Detector\RapidShareDetector(),
             new Detector\UnFichierDetector(),
             new Detector\DepositfilesDetector(),
             new Detector\FileserveDetector(),
-            new Detector\FufoxDetector(),
             new Detector\GigaupDetector(),
             new Detector\UploadhereDetector(),
             new Detector\UploadkingDetector(),
             new Detector\UptoboxDetector(),
-
-
+            new Detector\MultiuploadDetector(),
+            new Detector\HotfileDetector(),
+            new Detector\UploadingDetector(),
+            new Detector\FilejungleDetector(),
         );
     }
 }

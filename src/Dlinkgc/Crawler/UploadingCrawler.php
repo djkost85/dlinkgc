@@ -2,13 +2,13 @@
 
 namespace Dlinkgc\Crawler;
 
-class FileserveCrawler extends Crawler
+class UploadingCrawler extends Crawler
 {
     public function execute()
     {
         $dc = $this->getResponseDomCrawler();
         
-        $node = $dc->filter('#regularBtn');
+        $node = $dc->filter('form[id="downloadform"]');
         
         if (count($node) !== 1)
             return false;
